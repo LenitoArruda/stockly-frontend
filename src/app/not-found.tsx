@@ -18,7 +18,7 @@ export default function NotFound() {
           className="w-[200px] h-[200px] md:w-[300px] md:h-[400px] lg:w-[400px] lg:h-[400px]"
         />
 
-        <Box className="flex flex-col max-w-[450px] gap-[20px]">
+        <Box className="flex flex-col max-w-[450px] gap-[20px] text-center md:text-start">
           <Text className="text-[25px] lg:text-[32px] font-bold text-[#2F8EF4]">
             We looked everywhere but couldn&apos;t find that page.
           </Text>
