@@ -24,7 +24,7 @@ export function PageContainer(props: PageContainerProps) {
   }, [dataAuthUser, dispatch]);
 
   const classNameMain = user
-    ? 'bg-gray-100 m-6 p-5 flex-1 flex overflow-auto bg-white rounded-xl'
+    ? 'bg-gray-100 m-6 p-5 pr-2 flex-1 flex overflow-auto bg-white rounded-xl'
     : 'bg-white flex-1 flex overflow-auto bg-gradient-to-r from-white via-blue-100 to-blue-200';
 
   return (

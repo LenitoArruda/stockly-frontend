@@ -1,7 +1,7 @@
 import './globals.css';
 import { PageContainer } from '@/components/page-container';
 import { Metadata } from 'next';
-import { AppProvider } from '@/prpoviders/app-provider';
+import { AppProvider } from '@/providers/app-provider';
 
 export const metadata: Metadata = {
   title: 'Stockly',

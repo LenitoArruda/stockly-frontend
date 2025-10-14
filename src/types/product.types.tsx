@@ -4,8 +4,8 @@ export type ProductsFilterProps = {
   categoryId?: number;
   minPrice?: number;
   maxPrice?: number;
-  page?: number;
-  pageSize?: number;
+  page: number;
+  pageSize: number;
   sortBy?: 'name' | 'sku' | 'category' | 'stock' | 'price';
   sortOrder?: 'asc' | 'desc';
 };

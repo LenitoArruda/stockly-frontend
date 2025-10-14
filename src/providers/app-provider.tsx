@@ -16,7 +16,7 @@ export function AppProvider({ children }: Props) {
   return (
     <Provider store={store}>
       <QueryClientProvider client={client}>
-        <Theme>{children}</Theme>
+        <Theme appearance="dark">{children}</Theme>
       </QueryClientProvider>
     </Provider>
   );
