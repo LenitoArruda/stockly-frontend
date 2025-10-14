@@ -1,14 +1,14 @@
 'use client';
 
-import { AppDispatch } from '@/redux/store';
-import { logoutUser } from '@/redux/user/slice';
-import { useDispatch } from 'react-redux';
+import { useLogoutUser } from '@/hooks/useAuth';
 
 export function LogoutButton() {
-  const dispatch = useDispatch<AppDispatch>();
+  const { mutate: logout } = useLogoutUser();
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
+  const handleLogout = async () => {
+    logout();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    window.location.reload();
   };
 
   return (

@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { setUser } from '@/redux/user/slice';
 import { useEffect } from 'react';
-import { api } from '@/lib/api';
+import { useAuthUser } from '@/hooks/useAuth';
+import { User } from '@/types/user.types';
 
 type PageContainerProps = {
   children: React.ReactNode;
@@ -12,19 +13,16 @@ type PageContainerProps = {
 
 export function PageContainer(props: PageContainerProps) {
   const { children } = props;
+
   const user = useSelector((state: RootState) => state.userReducer.user);
   const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    async function fetchUser() {
-      await api
-        .get('/auth/me', { withCredentials: true })
-        .then((response) => dispatch(setUser(response?.data)))
-        .catch(() => dispatch(setUser(null)));
-    }
+  const { data: dataAuthUser } = useAuthUser();
 
-    fetchUser();
-  }, [dispatch]);
+  useEffect(() => {
+    if (dataAuthUser) dispatch(setUser(dataAuthUser as unknown as User));
+  }, [dataAuthUser, dispatch]);
+
   return (
     <div className="min-h-screen flex flex-col">
       {user && <Header />}
