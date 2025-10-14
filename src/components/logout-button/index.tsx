@@ -1,6 +1,7 @@
 'use client';
 
 import { useLogoutUser } from '@/hooks/useAuth';
+import { DefaultButton } from '../default-button';
 
 export function LogoutButton() {
   const { mutate: logout } = useLogoutUser();
@@ -11,12 +12,5 @@ export function LogoutButton() {
     window.location.reload();
   };
 
-  return (
-    <button
-      onClick={handleLogout}
-      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-    >
-      Logout
-    </button>
-  );
+  return <DefaultButton onClick={handleLogout}>Logout</DefaultButton>;
 }

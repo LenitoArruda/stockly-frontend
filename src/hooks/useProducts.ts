@@ -1,11 +1,12 @@
 import { api } from '@/lib/api';
+import { ProductsFilterProps } from '@/types/product.types';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-export function useProducts() {
+export function useProducts(params: ProductsFilterProps) {
   return useQuery({
-    queryKey: ['products'],
+    queryKey: ['products', params],
     queryFn: async () => {
-      const { data } = await api.get('/products');
+      const { data } = await api.get('/products/paginated', { params });
       return data;
     },
   });

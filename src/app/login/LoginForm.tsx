@@ -2,11 +2,11 @@
 
 import { login } from './actions';
 import { useActionState, useEffect } from 'react';
-import { SubmitButton } from '@/components/submit-button';
 import { Box } from '@radix-ui/themes';
 import { redirect } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { setUser } from '@/redux/user/slice';
+import { SubmitButton } from './SubmitButton';
 
 export function LoginForm() {
   const [state, loginAction] = useActionState(login, undefined);
@@ -18,7 +18,7 @@ export function LoginForm() {
       dispatch(setUser(state.user));
       redirect('/dashboard');
     }
-  }, [state]);
+  }, [dispatch, state]);
 
   return (
     <form

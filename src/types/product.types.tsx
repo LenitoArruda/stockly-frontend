@@ -1,0 +1,39 @@
+export type ProductsFilterProps = {
+  name?: string;
+  sku?: string;
+  categoryId?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  page?: number;
+  pageSize?: number;
+  sortBy?: 'name' | 'sku' | 'category' | 'stock' | 'price';
+  sortOrder?: 'asc' | 'desc';
+};
+
+export type ProductResponsePros = {
+  data: ProductProps[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+export type ProductProps = {
+  categoryId: number;
+  categoryName: string;
+  id: string;
+  name: string;
+  price: number;
+  sku: string;
+  stock: number;
+  variants?: ProductVariantProps[];
+};
+
+export type ProductVariantProps = {
+  id: string;
+  name: string;
+  price: number;
+  sku: string;
+  stock: number;
+  attributes: Record<string, string>;
+};
