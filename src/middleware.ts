@@ -16,20 +16,22 @@ export default async function middleware(req: NextRequest) {
 
   const token = req.cookies.get('session')?.value;
 
-  if (!token) {
-    return NextResponse.redirect(new URL('/login', req.url));
+  if (token) {
+    const { payload } = await jwtVerify(token, encodedKey).catch(() => ({
+      payload: null,
+    }));
+
+    if (payload?.sub && isPublic) {
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+
+    if (isProtected && !payload?.sub) {
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
   }
 
-  const { payload } = await jwtVerify(token, encodedKey).catch(() => ({
-    payload: null,
-  }));
-
-  if (isProtected && !payload?.sub) {
+  if (isProtected && !token) {
     return NextResponse.redirect(new URL('/login', req.url));
-  }
-
-  if (isPublic && payload?.sub) {
-    return NextResponse.redirect(new URL('/dashboard', req.url));
   }
 
   return NextResponse.next();

@@ -1,8 +1,7 @@
-import { Header } from '@/components/header';
-import { Theme } from '@radix-ui/themes';
 import './globals.css';
 import { PageContainer } from '@/components/page-container';
 import { Metadata } from 'next';
+import { AppProvider } from '@/prpoviders/app-provider';
 
 export const metadata: Metadata = {
   title: 'Stockly',
@@ -17,10 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="text-[#444444] antialiased ">
-        <Theme>
-          <Header />
+        <AppProvider>
           <PageContainer>{children}</PageContainer>
-        </Theme>
+        </AppProvider>
       </body>
     </html>
   );

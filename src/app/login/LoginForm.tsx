@@ -1,12 +1,24 @@
 'use client';
 
 import { login } from './actions';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { SubmitButton } from '@/components/submit-button';
 import { Box } from '@radix-ui/themes';
+import { redirect } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { setUser } from '@/redux/user/slice';
 
 export function LoginForm() {
   const [state, loginAction] = useActionState(login, undefined);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (state?.user) {
+      console.log(state.user);
+      dispatch(setUser(state.user));
+      redirect('/dashboard');
+    }
+  }, [state]);
 
   return (
     <form
@@ -23,9 +35,6 @@ export function LoginForm() {
           placeholder="Email"
           className="w-full border p-2 rounded"
         />
-        {state?.errors?.email && (
-          <p className="text-red-500 text-sm">{state.errors.email}</p>
-        )}
       </Box>
 
       <Box>
@@ -36,14 +45,12 @@ export function LoginForm() {
           placeholder="Password"
           className="w-full border p-2 rounded"
         />
-        {state?.errors?.email && (
-          <p className="text-red-500 text-sm">{state?.errors?.email}</p>
-        )}
       </Box>
 
       <Box className="flex justify-center w-full">
         <SubmitButton />
       </Box>
+      {state?.error && <p className="text-red-500 text-sm">{state?.error}</p>}
     </form>
   );
 }

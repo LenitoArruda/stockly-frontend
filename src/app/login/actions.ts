@@ -2,7 +2,6 @@
 
 import { api } from '@/lib/api';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import z from 'zod';
 
 const loginSchema = z.object({
@@ -12,7 +11,6 @@ const loginSchema = z.object({
 
 export async function login(prevState: unknown, formData: FormData) {
   const result = loginSchema.safeParse(Object.fromEntries(formData));
-
   if (!result.success) {
     return { errors: z.treeifyError(result.error) };
   }
@@ -33,15 +31,13 @@ export async function login(prevState: unknown, formData: FormData) {
 
   if (invalidCredentials) {
     return {
-      success: false,
-      errors: { email: ['Invalid email or password'] },
+      error: 'Invalid email or password',
     };
   }
 
   if (!invalidCredentials && !data) {
     return {
-      success: false,
-      errors: { email: ['Something went wrong'] },
+      error: 'Something went wrong',
     };
   }
 
@@ -54,7 +50,7 @@ export async function login(prevState: unknown, formData: FormData) {
     maxAge: 60 * 60 * 24,
   });
 
-  redirect('/dashboard');
+  return { user: data.user };
 }
 
 export async function logout() {}
