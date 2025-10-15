@@ -15,10 +15,11 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box } from '@radix-ui/themes';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { defaultFilter } from '../page';
+import { AttributeCard } from './AttributeCard';
 
 interface ModalProductProps {
   product: ProductProps | null;
@@ -43,6 +44,7 @@ export function ModalProduct(props: ModalProductProps) {
     setSelectedProduct(null);
     setModalProduct(false);
     queryClient.invalidateQueries({ queryKey: ['products'] });
+    setAttributes({});
     reset();
   };
 
@@ -68,6 +70,12 @@ export function ModalProduct(props: ModalProductProps) {
     resolver: zodResolver(productSchema),
   });
 
+  const [attributes, setAttributes] = useState<Record<string, string>>({});
+  const [addAttribute, setAddAttribute] = useState<{
+    title: string;
+    value: string;
+  }>({ title: '', value: '' });
+
   const queryClient = useQueryClient();
   const { mutate, isPending, isSuccess } = useCreateProduct();
   const {
@@ -84,6 +92,7 @@ export function ModalProduct(props: ModalProductProps) {
         price: data.price,
         stock: data.stock,
         categoryId: Number(data.categoryId),
+        attributes,
       };
       if (setProductFilters) setProductFilters(defaultFilter);
       mutateUpdate(bodyUpdateRequest);
@@ -101,6 +110,23 @@ export function ModalProduct(props: ModalProductProps) {
     }
   };
 
+  const removeAttribute = (id: number) => {
+    const newAttributes = { ...attributes };
+    const key = Object.keys(attributes)[id];
+    delete newAttributes[key];
+    setAttributes(newAttributes);
+  };
+
+  const handleAddAttribute = () => {
+    if (addAttribute.title && addAttribute.value) {
+      setAttributes((prev) => ({
+        ...prev,
+        [addAttribute.title]: addAttribute.value,
+      }));
+      setAddAttribute({ title: '', value: '' });
+    }
+  };
+
   useEffect(() => {
     if (isSuccess || isSuccessUpdate) onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,6 +140,7 @@ export function ModalProduct(props: ModalProductProps) {
         stock: product.stock,
         categoryId: String(product.categoryId),
       });
+      setAttributes(product.attributes || {});
     }
   }, [modalProduct, product, reset]);
 
@@ -143,7 +170,6 @@ export function ModalProduct(props: ModalProductProps) {
               visible={!!errors.name}
             />
           </div>
-
           <div>
             <label className="block font-medium">Price (USD)</label>
 
@@ -159,7 +185,6 @@ export function ModalProduct(props: ModalProductProps) {
               visible={!!errors.price}
             />
           </div>
-
           <div>
             <label className="block font-medium">Stock</label>
 
@@ -174,7 +199,6 @@ export function ModalProduct(props: ModalProductProps) {
               visible={!!errors.stock}
             />
           </div>
-
           <div>
             <label className="block font-medium">Category</label>
 
@@ -195,6 +219,64 @@ export function ModalProduct(props: ModalProductProps) {
               visible={!!errors.categoryId}
             />
           </div>
+          {product &&
+            product.attributes &&
+            Object.keys(product.attributes).length > 0 && (
+              <Box className="w-full flex flex-col gap-2">
+                <b>Attributes</b>
+
+                <Box className="flex gap-4 mb-2">
+                  <div>
+                    <label className="block font-medium">Title</label>
+
+                    <input
+                      type="text"
+                      value={addAttribute.title}
+                      className="w-[100px] border p-2 rounded"
+                      onChange={(e) =>
+                        setAddAttribute((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-medium">Value</label>
+
+                    <input
+                      type="text"
+                      value={addAttribute.value}
+                      className="w-[100px] border p-2 rounded"
+                      onChange={(e) =>
+                        setAddAttribute((prev) => ({
+                          ...prev,
+                          value: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <Box className="flex  items-end mb-2">
+                    <DefaultButton onClick={handleAddAttribute} type="button">
+                      +
+                    </DefaultButton>
+                  </Box>
+                </Box>
+
+                <Box className="flex flex-wrap gap-4">
+                  {Object.entries(attributes).map(([key, value], index) => (
+                    <AttributeCard
+                      key={index}
+                      title={key}
+                      value={value}
+                      index={index}
+                      handleRemove={removeAttribute}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            )}
         </Box>
 
         <Box className="w-full flex justify-center">

@@ -29,6 +29,7 @@ export default function Product({ params }: { params: { id: string } }) {
       stock: data.stock,
       categoryId: product.categoryId,
       categoryName: product.categoryName,
+      attributes: data.attributes,
     };
   };
 

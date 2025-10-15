@@ -28,6 +28,7 @@ export type ProductProps = {
   sku: string;
   stock: number;
   variants?: ProductVariantProps[];
+  attributes?: Record<string, string>;
 };
 
 export type ProductVariantProps = {
@@ -53,4 +54,5 @@ export type UpdateProductProps = {
   price: number;
   stock: number;
   categoryId: number;
+  attributes?: Record<string, string>;
 };

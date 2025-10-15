@@ -120,6 +120,17 @@ export function ProductCard(props: ProductCardProps) {
         </Box>
       </Box>
 
+      {isVariant && Object.keys(product.attributes || {}).length > 0 && (
+        <Box className="w-full flex flex-wrap gap-1">
+          {Object.entries(product.attributes || {}).map(([key, value]) => (
+            <Box key={key} className="flex gap-1">
+              <p className="text-xs font-bold text-gray-500">{key}:</p>
+              <p className="text-xs italic text-gray-500 truncate">{value}</p>
+            </Box>
+          ))}
+        </Box>
+      )}
+
       <Box className="flex gap-1">
         <p className="text-xs font-bold text-gray-500">SKU:</p>
 
