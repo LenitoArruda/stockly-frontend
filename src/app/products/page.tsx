@@ -1,12 +1,13 @@
 'use client';
 
 import { PageTitle } from '@/components/page-title';
-import { useCategories } from '@/hooks/useCategories';
 import { useProducts } from '@/hooks/useProducts';
 import { ProductProps, ProductsFilterProps } from '@/types/product.types';
 import { Box } from '@radix-ui/themes';
 import { useEffect, useRef, useState } from 'react';
-import { ProductCard } from './ProductCard';
+import { ProductCard } from './components/ProductCard';
+import { ModalProduct } from './components/ModalProduct';
+import { DefaultButton } from '@/components/default-button';
 
 export default function Dashboard() {
   const defaultFilter: ProductsFilterProps = {
@@ -19,9 +20,12 @@ export default function Dashboard() {
   const [productFilters, setProductFilters] =
     useState<ProductsFilterProps>(defaultFilter);
   const [products, setProducts] = useState<ProductProps[]>([]);
+  const [modalProduct, setModalProduct] = useState(false);
+  const [selectedProducts, setSelectedProducts] = useState<ProductProps | null>(
+    null,
+  );
   const [hasNextPage, setHasNextPage] = useState(false);
 
-  const { data: dataCategories } = useCategories();
   const { data: dataProducts } = useProducts(productFilters);
 
   useEffect(() => {
@@ -57,14 +61,24 @@ export default function Dashboard() {
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [dataCategories, dataProducts, hasNextPage]);
+  }, [dataProducts, hasNextPage]);
 
   return (
     <Box className="flex w-full flex-1 flex-col gap-2">
-      <PageTitle title="Products" />
+      <Box className="flex items-center justify-between mr-3">
+        <PageTitle title="Products" />
+        <DefaultButton onClick={() => setModalProduct(true)}>
+          New product
+        </DefaultButton>
+      </Box>
       <Box className="flex-1 w-full flex flex-wrap gap-6 overflow-auto max-h-[calc(100vh-190px)] pr-3">
         {products?.map((product: ProductProps) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            setSelectedProduct={setSelectedProducts}
+            setModalProduct={setModalProduct}
+          />
         ))}
         {hasNextPage && (
           <div
@@ -75,6 +89,12 @@ export default function Dashboard() {
           </div>
         )}
       </Box>
+      <ModalProduct
+        product={selectedProducts}
+        setSelectedProduct={setSelectedProducts}
+        modalProduct={modalProduct}
+        setModalProduct={setModalProduct}
+      />
     </Box>
   );
 }

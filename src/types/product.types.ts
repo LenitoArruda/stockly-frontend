@@ -37,3 +37,11 @@ export type ProductVariantProps = {
   stock: number;
   attributes: Record<string, string>;
 };
+
+export type CreateProductProps = {
+  name: string;
+  price: number;
+  stock: number;
+  categoryId: number;
+  sku: string;
+};

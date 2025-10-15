@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import { ProductsFilterProps } from '@/types/product.types';
+import { CreateProductProps, ProductsFilterProps } from '@/types/product.types';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export function useProducts(params: ProductsFilterProps) {
@@ -16,7 +16,7 @@ export function useCreateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (newProduct: { name: string; price: number }) => {
+    mutationFn: async (newProduct: CreateProductProps) => {
       const { data } = await api.post('/products', newProduct);
       return data;
     },
