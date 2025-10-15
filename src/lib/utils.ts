@@ -24,3 +24,10 @@ export const convertDataToSelectOptions = (
 export const createSku = (name: string): string => {
   return `SKU-${name.slice(0, 2).toUpperCase()}-${new Date().getTime()}`;
 };
+
+export function safeLocalStorage() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  return window.localStorage;
+}

@@ -6,6 +6,7 @@ import { setUser } from '@/redux/user/slice';
 import { useEffect } from 'react';
 import { useAuthUser } from '@/hooks/useAuth';
 import { User } from '@/types/user.types';
+import { safeLocalStorage } from '@/lib/utils';
 
 type PageContainerProps = {
   children: React.ReactNode;
@@ -17,12 +18,10 @@ export function PageContainer(props: PageContainerProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const user = useSelector((state: RootState) => state.userReducer.user);
+  const ls = safeLocalStorage();
+  const userLocalStorage = JSON.parse(ls?.getItem('user') || '{}');
 
   const { data: dataAuthUser, isError } = useAuthUser();
-
-  const userLocalStorage: User = JSON.parse(
-    localStorage?.getItem('user') || '{}',
-  );
 
   useEffect(() => {
     if (dataAuthUser) {
