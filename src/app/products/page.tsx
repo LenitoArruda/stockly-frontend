@@ -3,18 +3,21 @@
 import { PageTitle } from '@/components/page-title';
 import { useProducts } from '@/hooks/useProducts';
 import { ProductProps, ProductsFilterProps } from '@/types/product.types';
-import { Box } from '@radix-ui/themes';
+import { Box, Tooltip } from '@radix-ui/themes';
 import { useEffect, useRef, useState } from 'react';
 import { ProductCard } from './components/ProductCard';
 import { ModalProduct } from './components/ModalProduct';
 import { DefaultButton } from '@/components/default-button';
+import { Filters } from './components/Filters';
+
+export const defaultFilter: ProductsFilterProps = {
+  page: 1,
+  pageSize: 20,
+  sortBy: 'createdAt',
+  sortOrder: 'desc',
+};
 
 export default function Dashboard() {
-  const defaultFilter: ProductsFilterProps = {
-    page: 1,
-    pageSize: 20,
-  };
-
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const [productFilters, setProductFilters] =
@@ -66,10 +69,16 @@ export default function Dashboard() {
   return (
     <Box className="flex w-full flex-1 flex-col gap-2">
       <Box className="flex items-center justify-between mr-3">
-        <PageTitle title="Products" />
-        <DefaultButton onClick={() => setModalProduct(true)}>
-          New product
-        </DefaultButton>
+        <Box className="flex gap-3">
+          <PageTitle title="Products" />
+          <Filters filters={productFilters} setFilters={setProductFilters} />
+        </Box>
+        <Tooltip
+          content="New Product"
+          className="bg-black/50 p-1 rounded text-white text-xs"
+        >
+          <DefaultButton onClick={() => setModalProduct(true)}>+</DefaultButton>
+        </Tooltip>
       </Box>
       <Box className="flex-1 w-full flex flex-wrap gap-6 overflow-auto max-h-[calc(100vh-190px)] pr-3">
         {products?.map((product: ProductProps) => (

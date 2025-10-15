@@ -6,7 +6,7 @@ export type ProductsFilterProps = {
   maxPrice?: number;
   page: number;
   pageSize: number;
-  sortBy?: 'name' | 'sku' | 'category' | 'stock' | 'price';
+  sortBy?: 'name' | 'sku' | 'category' | 'stock' | 'price' | 'createdAt';
   sortOrder?: 'asc' | 'desc';
 };
 

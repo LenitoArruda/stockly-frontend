@@ -5,8 +5,7 @@ import { ErrorMessage } from '@/components/error-message';
 import { ModalDefault } from '@/components/modal-default';
 import { useCategories } from '@/hooks/useCategories';
 import { useCreateProduct } from '@/hooks/useProducts';
-import { CategoryProps } from '@/types/categories.types';
-import { SelectProps } from '@/types/general.types';
+import { convertDataToSelectOptions } from '@/lib/utils';
 import { CreateProductProps, ProductProps } from '@/types/product.types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box } from '@radix-ui/themes';
@@ -25,17 +24,6 @@ export function ModalProduct(props: ModalProductProps) {
   const { product, setSelectedProduct, setModalProduct, modalProduct } = props;
 
   const { data: dataCategories } = useCategories();
-
-  const convertDataToSelectOptions = () => {
-    let options: SelectProps[] = [];
-    if (dataCategories) {
-      options = dataCategories.map((category: CategoryProps) => ({
-        value: category.id,
-        label: category.name,
-      }));
-    }
-    return options;
-  };
 
   const onClose = () => {
     setSelectedProduct(null);
@@ -81,6 +69,7 @@ export function ModalProduct(props: ModalProductProps) {
   };
   useEffect(() => {
     if (isSuccess) onClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess]);
 
   return (
@@ -149,7 +138,7 @@ export function ModalProduct(props: ModalProductProps) {
               className="w-[300px] md:w-[200px] border p-2 rounded"
             >
               <option value="">Select category</option>
-              {convertDataToSelectOptions().map((c) => (
+              {convertDataToSelectOptions(dataCategories).map((c) => (
                 <option key={c.value} value={c.value}>
                   {c.label}
                 </option>
