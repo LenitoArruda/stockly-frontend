@@ -3,6 +3,7 @@
 This repository contains the **frontend** of the Stockly project, built with **Next.js**.  
 It integrates authentication with HttpOnly cookies, manages global state with Redux, and consumes the backend API with React Query.
 
+https://stockly-frontend.up.railway.app/login
 ---
 
 ## 🚀 Tech Stack
