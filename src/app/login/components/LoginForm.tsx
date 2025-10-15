@@ -4,7 +4,6 @@ import { login } from '../actions';
 import { useActionState, useEffect } from 'react';
 import { Box } from '@radix-ui/themes';
 import { SubmitButton } from './SubmitButton';
-import router from 'next/router';
 
 export function LoginForm() {
   const [state, loginAction] = useActionState(login, undefined);
