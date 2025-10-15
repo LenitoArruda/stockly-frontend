@@ -4,10 +4,15 @@ import { DefaultButton } from '@/components/default-button';
 import { ErrorMessage } from '@/components/error-message';
 import { ModalDefault } from '@/components/modal-default';
 import { useCategories } from '@/hooks/useCategories';
-import { useCreateProduct, useUpdateProduct } from '@/hooks/useProducts';
-import { convertDataToSelectOptions } from '@/lib/utils';
+import {
+  useCreateProduct,
+  useCreateVariant,
+  useUpdateProduct,
+} from '@/hooks/useProducts';
+import { convertDataToSelectOptions, createSku } from '@/lib/utils';
 import {
   CreateProductProps,
+  CreateVariantProps,
   ProductProps,
   ProductsFilterProps,
   UpdateProductProps,
@@ -27,6 +32,7 @@ interface ModalProductProps {
   setModalProduct: (modalProduct: boolean) => void;
   setSelectedProduct: (selectedProduct: ProductProps | null) => void;
   setProductFilters?: (filters: ProductsFilterProps) => void;
+  createVariant?: boolean;
 }
 
 export function ModalProduct(props: ModalProductProps) {
@@ -36,6 +42,7 @@ export function ModalProduct(props: ModalProductProps) {
     setModalProduct,
     modalProduct,
     setProductFilters,
+    createVariant,
   } = props;
 
   const { data: dataCategories } = useCategories();
@@ -43,6 +50,7 @@ export function ModalProduct(props: ModalProductProps) {
   const onClose = () => {
     setSelectedProduct(null);
     setModalProduct(false);
+    setErrorAttributes(false);
     queryClient.invalidateQueries({ queryKey: ['products'] });
     setAttributes({});
     reset();
@@ -71,6 +79,7 @@ export function ModalProduct(props: ModalProductProps) {
   });
 
   const [attributes, setAttributes] = useState<Record<string, string>>({});
+  const [errorAttributes, setErrorAttributes] = useState<boolean>(false);
   const [addAttribute, setAddAttribute] = useState<{
     title: string;
     value: string;
@@ -79,12 +88,33 @@ export function ModalProduct(props: ModalProductProps) {
   const queryClient = useQueryClient();
   const { mutate, isPending, isSuccess } = useCreateProduct();
   const {
+    mutate: mutateVariant,
+    isPending: isPendingVariant,
+    isSuccess: isSuccessVariant,
+  } = useCreateVariant();
+  const {
     mutate: mutateUpdate,
     isPending: isPendingUpdate,
     isSuccess: isSuccessUpdate,
   } = useUpdateProduct();
 
   const onSubmit = (data: ProductFormData) => {
+    if (createVariant) {
+      if (Object.keys(attributes).length === 0) {
+        setErrorAttributes(true);
+        return;
+      }
+      const bodyUpdateRequest: CreateVariantProps = {
+        parentId: Number(product?.id),
+        name: data.name,
+        price: data.price,
+        stock: data.stock,
+        sku: createSku(data.name),
+        attributes,
+      };
+      mutateVariant(bodyUpdateRequest);
+      return;
+    }
     if (product) {
       const bodyUpdateRequest: UpdateProductProps = {
         id: Number(product?.id),
@@ -97,12 +127,11 @@ export function ModalProduct(props: ModalProductProps) {
       if (setProductFilters) setProductFilters(defaultFilter);
       mutateUpdate(bodyUpdateRequest);
     } else {
-      const date = new Date();
       const bodyRequest: CreateProductProps = {
         name: data.name,
         price: data.price,
         stock: data.stock,
-        sku: `SKU-${data.name.slice(0, 2).toUpperCase()}-${date.getTime()}`,
+        sku: createSku(data.name),
         categoryId: Number(data.categoryId),
       };
       if (setProductFilters) setProductFilters(defaultFilter);
@@ -124,16 +153,20 @@ export function ModalProduct(props: ModalProductProps) {
         [addAttribute.title]: addAttribute.value,
       }));
       setAddAttribute({ title: '', value: '' });
+      setErrorAttributes(false);
     }
   };
 
-  useEffect(() => {
-    if (isSuccess || isSuccessUpdate) onClose();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isSuccessUpdate]);
+  const productVariant =
+    product?.parentId || createVariant || Object.keys(attributes).length > 0;
 
   useEffect(() => {
-    if (product) {
+    if (isSuccess || isSuccessUpdate || isSuccessVariant) onClose();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, isSuccessUpdate, isSuccessVariant]);
+
+  useEffect(() => {
+    if (product && !productVariant) {
       reset({
         name: product.name,
         price: product.price,
@@ -142,18 +175,28 @@ export function ModalProduct(props: ModalProductProps) {
       });
       setAttributes(product.attributes || {});
     }
-  }, [modalProduct, product, reset]);
+    if (!modalProduct) {
+      onClose();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modalProduct, product, productVariant, reset]);
 
   return (
     <ModalDefault
       open={modalProduct}
       onClose={onClose}
-      title={product ? `Edit Product | ${product.sku}` : 'New Product'}
+      title={
+        createVariant
+          ? `Create Variant | ${product?.sku}`
+          : product
+          ? `Edit Product | ${product.sku}`
+          : 'New Product'
+      }
       className="w-[90vw] lg:w-[70vw]  xl:w-[50vw]"
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col align-between  gap-2 w-full h-[calc(100vh-200px)] overflow-y-auto "
+        className="flex flex-col align-between  gap-2 w-full h-[calc(100vh-200px)] md:h-fit overflow-y-auto "
       >
         <Box className="flex flex-wrap gap-5 w-full">
           <div>
@@ -199,90 +242,96 @@ export function ModalProduct(props: ModalProductProps) {
               visible={!!errors.stock}
             />
           </div>
-          <div>
-            <label className="block font-medium">Category</label>
+          {!productVariant && (
+            <div>
+              <label className="block font-medium">Category</label>
 
-            <select
-              {...register('categoryId')}
-              className="w-[270px] md:w-[200px] border p-2 rounded"
-            >
-              <option value="">Select category</option>
-              {convertDataToSelectOptions(dataCategories).map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
+              <select
+                {...register('categoryId')}
+                className="w-[270px] md:w-[200px] border p-2 rounded"
+              >
+                <option value="">Select category</option>
+                {convertDataToSelectOptions(dataCategories).map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
 
-            <ErrorMessage
-              message={errors?.categoryId?.message || ''}
-              visible={!!errors.categoryId}
-            />
-          </div>
-          {product &&
-            product.attributes &&
-            Object.keys(product.attributes).length > 0 && (
-              <Box className="w-full flex flex-col gap-2">
-                <b>Attributes</b>
+              <ErrorMessage
+                message={errors?.categoryId?.message || ''}
+                visible={!!errors.categoryId}
+              />
+            </div>
+          )}
+          {productVariant && (
+            <Box className="w-full flex flex-col gap-2">
+              <b>Attributes</b>
 
-                <Box className="flex gap-4 mb-2">
-                  <div>
-                    <label className="block font-medium">Title</label>
+              <Box className="flex gap-4 mb-2">
+                <div>
+                  <label className="block font-medium">Title</label>
 
-                    <input
-                      type="text"
-                      value={addAttribute.title}
-                      className="w-[100px] border p-2 rounded"
-                      onChange={(e) =>
-                        setAddAttribute((prev) => ({
-                          ...prev,
-                          title: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    value={addAttribute.title}
+                    className="w-[100px] border p-2 rounded"
+                    onChange={(e) =>
+                      setAddAttribute((prev) => ({
+                        ...prev,
+                        title: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
 
-                  <div>
-                    <label className="block font-medium">Value</label>
+                <div>
+                  <label className="block font-medium">Value</label>
 
-                    <input
-                      type="text"
-                      value={addAttribute.value}
-                      className="w-[100px] border p-2 rounded"
-                      onChange={(e) =>
-                        setAddAttribute((prev) => ({
-                          ...prev,
-                          value: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <Box className="flex  items-end mb-2">
-                    <DefaultButton onClick={handleAddAttribute} type="button">
-                      +
-                    </DefaultButton>
-                  </Box>
-                </Box>
-
-                <Box className="flex flex-wrap gap-4">
-                  {Object.entries(attributes).map(([key, value], index) => (
-                    <AttributeCard
-                      key={index}
-                      title={key}
-                      value={value}
-                      index={index}
-                      handleRemove={removeAttribute}
-                    />
-                  ))}
+                  <input
+                    type="text"
+                    value={addAttribute.value}
+                    className="w-[100px] border p-2 rounded"
+                    onChange={(e) =>
+                      setAddAttribute((prev) => ({
+                        ...prev,
+                        value: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <Box className="flex  items-end mb-2">
+                  <DefaultButton onClick={handleAddAttribute} type="button">
+                    +
+                  </DefaultButton>
                 </Box>
               </Box>
-            )}
+
+              <Box className="flex flex-wrap gap-4">
+                {Object.entries(attributes).map(([key, value], index) => (
+                  <AttributeCard
+                    key={index}
+                    title={key}
+                    value={value}
+                    index={index}
+                    handleRemove={removeAttribute}
+                  />
+                ))}
+              </Box>
+              <ErrorMessage
+                message="At least one attribute is required"
+                visible={errorAttributes}
+              />
+            </Box>
+          )}
         </Box>
 
         <Box className="w-full flex justify-center">
           <DefaultButton
             type="submit"
-            disabled={isSubmitting || isPending || isPendingUpdate}
+            disabled={
+              isSubmitting || isPending || isPendingUpdate || isPendingVariant
+            }
           >
             Save Product
           </DefaultButton>

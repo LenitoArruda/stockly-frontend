@@ -10,7 +10,7 @@ import { formatUsd } from '@/lib/utils';
 import Skeleton from 'react-loading-skeleton';
 import { redirect } from 'next/navigation';
 import { ProductCard } from '@/app/products/components/ProductCard';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PencilIcon, TrashIcon } from '@phosphor-icons/react';
 import { ModalProduct } from '@/app/products/components/ModalProduct';
 import { ModalConfirmation } from '@/components/modal-confirmation';
@@ -35,8 +35,10 @@ export default function Product({ params }: { params: { id: string } }) {
 
   const { mutate: deleteProduct, isPending } = useDeleteProduct();
 
-  const [modalProduct, setModalProduct] = useState(false);
-  const [modalConfirmationOpen, setModalConfirmationOpen] = useState(false);
+  const [modalProduct, setModalProduct] = useState<boolean>(false);
+  const [modalVariant, setModalVariant] = useState<boolean>(false);
+  const [modalConfirmationOpen, setModalConfirmationOpen] =
+    useState<boolean>(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductProps | null>(
     null,
   );
@@ -70,6 +72,18 @@ export default function Product({ params }: { params: { id: string } }) {
     setSelectedProduct(null);
     setModalConfirmationOpen(true);
   };
+
+  const handleAddVariant = () => {
+    setModalVariant(true);
+    setSelectedProduct(product);
+    setModalProduct(true);
+  };
+
+  useEffect(() => {
+    if (!modalProduct) {
+      setModalVariant(false);
+    }
+  }, [modalProduct]);
 
   return (
     <Box className="flex w-full flex-1 flex-col gap-6 max-h-[calc(100vh-150px)] overflow-auto">
@@ -117,8 +131,19 @@ export default function Product({ params }: { params: { id: string } }) {
         />
       </Box>
 
-      <Box className="flex w-full">
+      <Box className="flex w-full gap-6">
         <PageTitle title="Variants" />
+
+        <Tooltip
+          content={'Create variant'}
+          className="bg-black/50 p-1 rounded text-white text-xs"
+        >
+          <Box className="max-h-[32px] flex">
+            <DefaultButton onClick={handleAddVariant} type="button">
+              +
+            </DefaultButton>
+          </Box>
+        </Tooltip>
       </Box>
 
       {isLoading ? (
@@ -150,6 +175,7 @@ export default function Product({ params }: { params: { id: string } }) {
         setSelectedProduct={setSelectedProduct}
         modalProduct={modalProduct}
         setModalProduct={setModalProduct}
+        createVariant={modalVariant}
       />
 
       <ModalConfirmation

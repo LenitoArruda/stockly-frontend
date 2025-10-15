@@ -20,3 +20,7 @@ export const convertDataToSelectOptions = (
   }
   return options;
 };
+
+export const createSku = (name: string): string => {
+  return `SKU-${name.slice(0, 2).toUpperCase()}-${new Date().getTime()}`;
+};

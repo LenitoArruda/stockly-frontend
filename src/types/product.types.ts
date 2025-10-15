@@ -56,3 +56,12 @@ export type UpdateProductProps = {
   categoryId: number;
   attributes?: Record<string, string>;
 };
+
+export type CreateVariantProps = {
+  name: string;
+  sku: string;
+  price: number;
+  stock: number;
+  parentId: number;
+  attributes: Record<string, string>;
+};

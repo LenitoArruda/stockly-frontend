@@ -1,6 +1,7 @@
 import { api } from '@/lib/api';
 import {
   CreateProductProps,
+  CreateVariantProps,
   ProductsFilterProps,
   UpdateProductProps,
 } from '@/types/product.types';
@@ -32,6 +33,20 @@ export function useCreateProduct() {
   return useMutation({
     mutationFn: async (newProduct: CreateProductProps) => {
       const { data } = await api.post('/products', newProduct);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+
+export function useCreateVariant() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (newProduct: CreateVariantProps) => {
+      const { data } = await api.post('/products/variant', newProduct);
       return data;
     },
     onSuccess: () => {
