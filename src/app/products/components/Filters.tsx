@@ -41,7 +41,7 @@ export function Filters(props: FiltersProps) {
             type="text"
             name="name"
             placeholder="Name"
-            value={filters.name}
+            value={filters.name || ''}
             onChange={handleChange}
             className="border p-2 rounded"
           />
@@ -49,7 +49,7 @@ export function Filters(props: FiltersProps) {
             type="text"
             name="sku"
             placeholder="SKU"
-            value={filters.sku}
+            value={filters.sku || ''}
             onChange={handleChange}
             className="border p-2 rounded"
           />
@@ -57,7 +57,7 @@ export function Filters(props: FiltersProps) {
             type="number"
             name="minPrice"
             placeholder="Min Price"
-            value={filters.minPrice}
+            value={filters.minPrice || ''}
             onChange={handleChange}
             className="border p-2 rounded"
           />
@@ -65,7 +65,7 @@ export function Filters(props: FiltersProps) {
             type="number"
             name="maxPrice"
             placeholder="Max Price"
-            value={filters.maxPrice}
+            value={filters.maxPrice || ''}
             onChange={handleChange}
             className="border p-2 rounded"
           />

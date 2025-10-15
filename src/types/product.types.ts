@@ -2,8 +2,8 @@ export type ProductsFilterProps = {
   name?: string;
   sku?: string;
   categoryId?: number;
-  minPrice?: number;
-  maxPrice?: number;
+  minPrice?: number | string;
+  maxPrice?: number | string;
   page: number;
   pageSize: number;
   sortBy?: 'name' | 'sku' | 'category' | 'stock' | 'price' | 'createdAt';

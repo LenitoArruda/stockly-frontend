@@ -12,6 +12,11 @@ import { Filters } from './components/Filters';
 
 export const defaultFilter: ProductsFilterProps = {
   page: 1,
+  name: undefined,
+  sku: undefined,
+  minPrice: undefined,
+  maxPrice: undefined,
+  categoryId: undefined,
   pageSize: 20,
   sortBy: 'createdAt',
   sortOrder: 'desc',
