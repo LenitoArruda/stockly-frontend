@@ -17,6 +17,9 @@ export function LoginForm() {
       const login = async () => {
         dispatch(setUser(state.user));
         localStorage?.setItem('user', JSON.stringify(state.user));
+        if (state?.token) {
+          localStorage?.setItem('token', state.token);
+        }
         redirect('/products');
       };
       login();

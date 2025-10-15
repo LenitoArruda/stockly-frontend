@@ -50,7 +50,7 @@ export async function login(prevState: unknown, formData: FormData) {
     maxAge: 60 * 60 * 24,
   });
 
-  return { user: data.user };
+  return { user: data.user, token };
 }
 
 export async function logout() {}
