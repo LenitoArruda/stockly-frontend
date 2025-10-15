@@ -4,11 +4,11 @@ import Image from 'next/image';
 
 export default function NotFound() {
   const handleButtonClick = () => {
-    window.location.href = '/';
+    window.location.href = '/products';
   };
 
   return (
-    <Box className="flex flex-col items-center justify-center h-[80vh] gap-[30px]">
+    <Box className="flex flex-col items-center justify-center h-[80vh] gap-[30px] w-full">
       <Box className="flex flex-col md:flex-row items-center justify-center gap-[10px] md:gap-[50px]">
         <Image
           src="/not-found.svg"

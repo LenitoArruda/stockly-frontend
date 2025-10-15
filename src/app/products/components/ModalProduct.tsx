@@ -153,7 +153,7 @@ export function ModalProduct(props: ModalProductProps) {
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col align-between  gap-2 w-full"
+        className="flex flex-col align-between  gap-2 w-full h-[calc(100vh-200px)] overflow-y-auto "
       >
         <Box className="flex flex-wrap gap-5 w-full">
           <div>
@@ -162,7 +162,7 @@ export function ModalProduct(props: ModalProductProps) {
             <input
               type="text"
               {...register('name')}
-              className="w-[300px] border p-2 rounded"
+              className="w-[270px] border p-2 rounded"
             />
 
             <ErrorMessage
@@ -177,7 +177,7 @@ export function ModalProduct(props: ModalProductProps) {
               type="number"
               step="0.01"
               {...register('price', { valueAsNumber: true })}
-              className="w-[300px] md:w-[200px] border p-2 rounded"
+              className="w-[270px] md:w-[200px] border p-2 rounded"
             />
 
             <ErrorMessage
@@ -191,7 +191,7 @@ export function ModalProduct(props: ModalProductProps) {
             <input
               type="number"
               {...register('stock', { valueAsNumber: true })}
-              className="w-[300px] md:w-[200px] border p-2 rounded"
+              className="w-[270px] md:w-[200px] border p-2 rounded"
             />
 
             <ErrorMessage
@@ -204,7 +204,7 @@ export function ModalProduct(props: ModalProductProps) {
 
             <select
               {...register('categoryId')}
-              className="w-[300px] md:w-[200px] border p-2 rounded"
+              className="w-[270px] md:w-[200px] border p-2 rounded"
             >
               <option value="">Select category</option>
               {convertDataToSelectOptions(dataCategories).map((c) => (

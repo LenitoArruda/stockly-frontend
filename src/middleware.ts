@@ -8,6 +8,10 @@ const encodedKey = new TextEncoder().encode(secretKey);
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
+  if (path === '/') {
+    return NextResponse.redirect(new URL('/products', req.url));
+  }
+
   const protectedRoutes = ['/product', '/products', '/users', '/categories'];
   const publicRoutes = ['/login'];
 
