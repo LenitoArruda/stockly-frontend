@@ -9,3 +9,10 @@ export type User = {
   name: string;
   role: 'admin' | 'manager';
 };
+
+export type CreateUser = {
+  email: string;
+  name: string;
+  role: 'admin' | 'manager';
+  password: string;
+};

@@ -166,7 +166,7 @@ export function ModalProduct(props: ModalProductProps) {
   }, [isSuccess, isSuccessUpdate, isSuccessVariant]);
 
   useEffect(() => {
-    if (product && !productVariant) {
+    if (modalProduct && product && !productVariant) {
       reset({
         name: product.name,
         price: product.price,

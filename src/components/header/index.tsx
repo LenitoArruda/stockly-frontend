@@ -115,7 +115,7 @@ export function Header() {
               User Info
             </DropdownMenu.Label>
             <DropdownMenu.Item>Email: user@email.com</DropdownMenu.Item>
-            <DropdownMenu.Separator />
+            <DropdownMenu.Item>Role: {user?.role}</DropdownMenu.Item>
             <DropdownMenu.Item>
               <LogoutButton />
             </DropdownMenu.Item>

@@ -1,4 +1,5 @@
 import { api } from '@/lib/api';
+import { CreateUser } from '@/types/user.types';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export function useUsers() {
@@ -15,11 +16,7 @@ export function useCreateUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (newUser: {
-      name: string;
-      email: string;
-      password: string;
-    }) => {
+    mutationFn: async (newUser: CreateUser) => {
       const { data } = await api.post('/users', newUser);
       return data;
     },
