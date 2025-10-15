@@ -16,7 +16,7 @@ export function LoginForm() {
     if (state?.user) {
       const login = async () => {
         dispatch(setUser(state.user));
-        localStorage.setItem('user', JSON.stringify(state.user));
+        localStorage?.setItem('user', JSON.stringify(state.user));
         redirect('/products');
       };
       login();

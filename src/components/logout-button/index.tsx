@@ -9,7 +9,7 @@ export function LogoutButton() {
   const handleLogout = async () => {
     logout();
     await new Promise((resolve) => setTimeout(resolve, 500));
-    localStorage.clear();
+    localStorage?.clear();
     window.location.reload();
   };
 
