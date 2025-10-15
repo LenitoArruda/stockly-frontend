@@ -1,5 +1,9 @@
 import { api } from '@/lib/api';
-import { CreateProductProps, ProductsFilterProps } from '@/types/product.types';
+import {
+  CreateProductProps,
+  ProductsFilterProps,
+  UpdateProductProps,
+} from '@/types/product.types';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export function useProducts(params: ProductsFilterProps) {
@@ -40,14 +44,7 @@ export function useUpdateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      ...rest
-    }: {
-      id: number;
-      name?: string;
-      price?: number;
-    }) => {
+    mutationFn: async ({ id, ...rest }: UpdateProductProps) => {
       const { data } = await api.patch(`/products/${id}`, rest);
       return data;
     },

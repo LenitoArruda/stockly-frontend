@@ -43,6 +43,7 @@ export default function Products() {
 
   const handleDeleteProduct = async () => {
     deleteProduct(Number(selectedProducts?.id));
+    setProductFilters(defaultFilter);
     handleCloseModalConfirmation();
   };
 
@@ -83,7 +84,8 @@ export default function Products() {
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [dataProducts, hasNextPage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataProducts]);
 
   return (
     <Box className="flex w-full flex-1 flex-col gap-2">
@@ -119,7 +121,7 @@ export default function Products() {
           {hasNextPage && (
             <div
               ref={loadMoreRef}
-              className="h-10 flex justify-center items-center"
+              className="h-10 flex justify-center items-center bg-red-200"
             >
               <Spinner />
             </div>
@@ -132,6 +134,7 @@ export default function Products() {
         setSelectedProduct={setSelectedProducts}
         modalProduct={modalProduct}
         setModalProduct={setModalProduct}
+        setProductFilters={setProductFilters}
       />
 
       <ModalConfirmation

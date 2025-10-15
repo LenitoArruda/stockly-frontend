@@ -29,7 +29,6 @@ export function PageContainer(props: PageContainerProps) {
       dispatch(setUser(dataAuthUser as unknown as User));
     }
     if (isError) {
-      localStorage?.removeItem('user');
       dispatch(setUser({} as User));
     }
   }, [dataAuthUser, dispatch, isError]);

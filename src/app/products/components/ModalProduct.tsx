@@ -4,30 +4,45 @@ import { DefaultButton } from '@/components/default-button';
 import { ErrorMessage } from '@/components/error-message';
 import { ModalDefault } from '@/components/modal-default';
 import { useCategories } from '@/hooks/useCategories';
-import { useCreateProduct } from '@/hooks/useProducts';
+import { useCreateProduct, useUpdateProduct } from '@/hooks/useProducts';
 import { convertDataToSelectOptions } from '@/lib/utils';
-import { CreateProductProps, ProductProps } from '@/types/product.types';
+import {
+  CreateProductProps,
+  ProductProps,
+  ProductsFilterProps,
+  UpdateProductProps,
+} from '@/types/product.types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box } from '@radix-ui/themes';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
+import { defaultFilter } from '../page';
 
 interface ModalProductProps {
   product: ProductProps | null;
   modalProduct: boolean;
   setModalProduct: (modalProduct: boolean) => void;
   setSelectedProduct: (selectedProduct: ProductProps | null) => void;
+  setProductFilters?: (filters: ProductsFilterProps) => void;
 }
 
 export function ModalProduct(props: ModalProductProps) {
-  const { product, setSelectedProduct, setModalProduct, modalProduct } = props;
+  const {
+    product,
+    setSelectedProduct,
+    setModalProduct,
+    modalProduct,
+    setProductFilters,
+  } = props;
 
   const { data: dataCategories } = useCategories();
 
   const onClose = () => {
     setSelectedProduct(null);
     setModalProduct(false);
+    queryClient.invalidateQueries({ queryKey: ['products'] });
     reset();
   };
 
@@ -39,7 +54,7 @@ export function ModalProduct(props: ModalProductProps) {
     stock: z
       .number({ error: 'Stock is required' })
       .positive('Stock must be greater than 0'),
-    category: z.string().min(1, 'Category is required'),
+    categoryId: z.string().min(1, 'Category is required'),
   });
 
   type ProductFormData = z.infer<typeof productSchema>;
@@ -53,30 +68,60 @@ export function ModalProduct(props: ModalProductProps) {
     resolver: zodResolver(productSchema),
   });
 
+  const queryClient = useQueryClient();
   const { mutate, isPending, isSuccess } = useCreateProduct();
+  const {
+    mutate: mutateUpdate,
+    isPending: isPendingUpdate,
+    isSuccess: isSuccessUpdate,
+  } = useUpdateProduct();
 
   const onSubmit = (data: ProductFormData) => {
-    const date = new Date();
-    const bodyRequest: CreateProductProps = {
-      name: data.name,
-      price: data.price,
-      stock: data.stock,
-      sku: `SKU-${data.name.slice(0, 2).toUpperCase()}-${date.getTime()}`,
-      categoryId: Number(data.category),
-    };
-
-    mutate(bodyRequest);
+    if (product) {
+      const bodyUpdateRequest: UpdateProductProps = {
+        id: Number(product?.id),
+        name: data.name,
+        price: data.price,
+        stock: data.stock,
+        categoryId: Number(data.categoryId),
+      };
+      if (setProductFilters) setProductFilters(defaultFilter);
+      mutateUpdate(bodyUpdateRequest);
+    } else {
+      const date = new Date();
+      const bodyRequest: CreateProductProps = {
+        name: data.name,
+        price: data.price,
+        stock: data.stock,
+        sku: `SKU-${data.name.slice(0, 2).toUpperCase()}-${date.getTime()}`,
+        categoryId: Number(data.categoryId),
+      };
+      if (setProductFilters) setProductFilters(defaultFilter);
+      mutate(bodyRequest);
+    }
   };
+
   useEffect(() => {
-    if (isSuccess) onClose();
+    if (isSuccess || isSuccessUpdate) onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess]);
+  }, [isSuccess, isSuccessUpdate]);
+
+  useEffect(() => {
+    if (product) {
+      reset({
+        name: product.name,
+        price: product.price,
+        stock: product.stock,
+        categoryId: String(product.categoryId),
+      });
+    }
+  }, [modalProduct, product, reset]);
 
   return (
     <ModalDefault
       open={modalProduct}
       onClose={onClose}
-      title={product ? 'Edit Product' : 'New Product'}
+      title={product ? `Edit Product | ${product.sku}` : 'New Product'}
       className="w-[90vw] lg:w-[70vw]  xl:w-[50vw]"
     >
       <form
@@ -134,7 +179,7 @@ export function ModalProduct(props: ModalProductProps) {
             <label className="block font-medium">Category</label>
 
             <select
-              {...register('category')}
+              {...register('categoryId')}
               className="w-[300px] md:w-[200px] border p-2 rounded"
             >
               <option value="">Select category</option>
@@ -146,14 +191,17 @@ export function ModalProduct(props: ModalProductProps) {
             </select>
 
             <ErrorMessage
-              message={errors?.category?.message || ''}
-              visible={!!errors.category}
+              message={errors?.categoryId?.message || ''}
+              visible={!!errors.categoryId}
             />
           </div>
         </Box>
 
         <Box className="w-full flex justify-center">
-          <DefaultButton type="submit" disabled={isSubmitting || isPending}>
+          <DefaultButton
+            type="submit"
+            disabled={isSubmitting || isPending || isPendingUpdate}
+          >
             Save Product
           </DefaultButton>
         </Box>

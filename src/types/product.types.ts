@@ -46,3 +46,11 @@ export type CreateProductProps = {
   categoryId: number;
   sku: string;
 };
+
+export type UpdateProductProps = {
+  id: number;
+  name: string;
+  price: number;
+  stock: number;
+  categoryId: number;
+};
