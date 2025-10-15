@@ -6,7 +6,9 @@ It integrates authentication with HttpOnly cookies, manages global state with Re
 https://stockly-frontend.up.railway.app/login
 
 User default: admin@example.com
+
 Password: 123456
+
 ---
 
 ## 🚀 Tech Stack
