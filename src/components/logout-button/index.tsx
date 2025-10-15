@@ -8,9 +8,8 @@ export function LogoutButton() {
 
   const handleLogout = async () => {
     logout();
-    await new Promise((resolve) => setTimeout(resolve, 500));
     localStorage?.clear();
-    window.location.reload();
+    window.location.href = '/login';
   };
 
   return <DefaultButton onClick={handleLogout}>Logout</DefaultButton>;

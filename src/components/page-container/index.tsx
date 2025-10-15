@@ -1,12 +1,8 @@
 'use client';
 import { Header } from '../header';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
-import { setUser } from '@/redux/user/slice';
-import { useEffect } from 'react';
-import { useAuthUser } from '@/hooks/useAuth';
-import { User } from '@/types/user.types';
+import { useEffect, useState } from 'react';
 import { safeLocalStorage } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 type PageContainerProps = {
   children: React.ReactNode;
@@ -15,32 +11,27 @@ type PageContainerProps = {
 export function PageContainer(props: PageContainerProps) {
   const { children } = props;
 
-  const dispatch = useDispatch<AppDispatch>();
-
-  const user = useSelector((state: RootState) => state.userReducer.user);
   const ls = safeLocalStorage();
-  const userLocalStorage = JSON.parse(ls?.getItem('user') || '{}');
 
-  const { data: dataAuthUser, isError } = useAuthUser();
+  const router = useRouter();
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    if (dataAuthUser) {
-      dispatch(setUser(dataAuthUser as unknown as User));
+    const tokenLocalStorage = localStorage.getItem('token');
+    if (!tokenLocalStorage) {
+      localStorage?.clear();
+      router.push('/login');
     }
-    if (isError) {
-      localStorage?.removeItem('user');
-      dispatch(setUser({} as User));
-    }
-  }, [dataAuthUser, dispatch, isError]);
+    setToken(tokenLocalStorage);
+  }, [ls, router]);
 
-  const classNameMain =
-    userLocalStorage?.id || user?.id
-      ? 'bg-gray-100 m-6 p-5 pr-2 flex-1 flex overflow-auto bg-white rounded-xl'
-      : 'bg-white flex-1 flex overflow-auto bg-gradient-to-r from-white via-blue-100 to-blue-200';
+  const classNameMain = token
+    ? 'bg-gray-100 m-6 p-5 pr-2 flex-1 flex overflow-auto bg-white rounded-xl'
+    : 'bg-white flex-1 flex overflow-auto bg-gradient-to-r from-white via-blue-100 to-blue-200';
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-      {(userLocalStorage?.id || user?.id) && <Header />}
+      {token && <Header />}
 
       <main className={classNameMain}>{children}</main>
     </div>

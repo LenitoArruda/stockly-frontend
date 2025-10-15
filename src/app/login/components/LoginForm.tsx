@@ -3,28 +3,25 @@
 import { login } from '../actions';
 import { useActionState, useEffect } from 'react';
 import { Box } from '@radix-ui/themes';
-import { redirect } from 'next/navigation';
-import { useDispatch } from 'react-redux';
-import { setUser } from '@/redux/user/slice';
 import { SubmitButton } from './SubmitButton';
+import router from 'next/router';
 
 export function LoginForm() {
   const [state, loginAction] = useActionState(login, undefined);
-  const dispatch = useDispatch();
 
   useEffect(() => {
+    if (state?.token) {
+      localStorage?.setItem('token', state.token);
+    }
+
     if (state?.user) {
       const login = async () => {
-        dispatch(setUser(state.user));
         localStorage?.setItem('user', JSON.stringify(state.user));
-        if (state?.token) {
-          localStorage?.setItem('token', state.token);
-        }
-        redirect('/products');
+        window.location.href = '/products';
       };
       login();
     }
-  }, [dispatch, state]);
+  }, [state]);
 
   return (
     <form

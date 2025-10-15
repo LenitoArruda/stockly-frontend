@@ -6,7 +6,6 @@ import { LogoutButton } from '../logout-button';
 import { useState } from 'react';
 import { ListIcon } from '@phosphor-icons/react';
 import { User } from '@/types/user.types';
-import { useAuthUser } from '@/hooks/useAuth';
 
 export function Header() {
   const [openMenu, setOpenMenu] = useState(false);
@@ -19,9 +18,7 @@ export function Header() {
     localStorage?.getItem('user') || '{}',
   );
 
-  const { data: dataAuthUser } = useAuthUser();
-
-  const user: User = userLocalStorage || dataAuthUser;
+  const user: User = userLocalStorage;
 
   return (
     <header className="h-[60px] bg-white flex items-center px-6 shadow-md justify-between">
