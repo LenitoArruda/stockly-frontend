@@ -4,6 +4,7 @@ import { ProductProps } from '@/types/product.types';
 import { Box, Card, IconButton, Tooltip } from '@radix-ui/themes';
 import { PencilIcon } from '@phosphor-icons/react';
 import { formatUsd } from '@/lib/utils';
+import { redirect } from 'next/navigation';
 
 interface ProductCardProps {
   product: ProductProps;
@@ -22,8 +23,15 @@ export function ProductCard(props: ProductCardProps) {
     setModalProduct(true);
   };
 
+  const onCardClick = () => {
+    redirect(`/product/${product.id}`);
+  };
+
   return (
-    <Card className="flex flex-col justify-between gap-4 p-4 bg-white rounded-xl shadow-xl border-b-4 border-blue-300 h-fit w-[300px] cursor-pointer transform transition duration-300 hover:scale-102 overflow-hidden">
+    <Card
+      onClick={onCardClick}
+      className="flex flex-col justify-between gap-4 p-4 bg-white rounded-xl shadow-xl border-b-4 border-blue-300 h-fit w-[300px] cursor-pointer transform transition duration-300 hover:scale-102 overflow-hidden"
+    >
       <Box className="w-full flex justify-between gap-2">
         <Tooltip
           content={product.name}

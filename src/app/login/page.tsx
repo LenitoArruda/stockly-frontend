@@ -1,5 +1,5 @@
 import { Box } from '@radix-ui/themes';
-import { LoginForm } from './LoginForm';
+import { LoginForm } from './components/LoginForm';
 import Image from 'next/image';
 
 export default function LoginPage() {

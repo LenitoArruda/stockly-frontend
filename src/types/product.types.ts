@@ -21,6 +21,7 @@ export type ProductResponsePros = {
 export type ProductProps = {
   categoryId: number;
   categoryName: string;
+  parentId?: number;
   id: string;
   name: string;
   price: number;

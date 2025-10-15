@@ -12,6 +12,16 @@ export function useProducts(params: ProductsFilterProps) {
   });
 }
 
+export function useProductById(id: number | string) {
+  return useQuery({
+    queryKey: ['products', id],
+    queryFn: async () => {
+      const { data } = await api.get(`/products/by-id/${id}`);
+      return data;
+    },
+  });
+}
+
 export function useCreateProduct() {
   const queryClient = useQueryClient();
 

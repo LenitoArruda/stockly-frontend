@@ -5,7 +5,7 @@ import { LogoutButton } from '../logout-button';
 
 export function Header() {
   const handleLogoClick = () => {
-    window.location.href = '/';
+    window.location.href = '/products';
   };
 
   return (

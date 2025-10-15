@@ -8,7 +8,7 @@ const encodedKey = new TextEncoder().encode(secretKey);
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
-  const protectedRoutes = ['/dashboard', '/products', '/users'];
+  const protectedRoutes = ['/product', '/products', '/users', '/categories'];
   const publicRoutes = ['/login'];
 
   const isProtected = protectedRoutes.some((route) => path.startsWith(route));
@@ -22,7 +22,7 @@ export default async function middleware(req: NextRequest) {
     }));
 
     if (payload?.sub && isPublic) {
-      return NextResponse.redirect(new URL('/dashboard', req.url));
+      return NextResponse.redirect(new URL('/products', req.url));
     }
 
     if (isProtected && !payload?.sub) {

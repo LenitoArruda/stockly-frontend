@@ -9,6 +9,8 @@ import { ProductCard } from './components/ProductCard';
 import { ModalProduct } from './components/ModalProduct';
 import { DefaultButton } from '@/components/default-button';
 import { Filters } from './components/Filters';
+import 'react-loading-skeleton/dist/skeleton.css';
+import Skeleton from 'react-loading-skeleton';
 
 export const defaultFilter: ProductsFilterProps = {
   page: 1,
@@ -22,7 +24,7 @@ export const defaultFilter: ProductsFilterProps = {
   sortOrder: 'desc',
 };
 
-export default function Dashboard() {
+export default function Products() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const [productFilters, setProductFilters] =
@@ -34,7 +36,7 @@ export default function Dashboard() {
   );
   const [hasNextPage, setHasNextPage] = useState(false);
 
-  const { data: dataProducts } = useProducts(productFilters);
+  const { data: dataProducts, isLoading } = useProducts(productFilters);
 
   useEffect(() => {
     if (dataProducts) {
@@ -85,24 +87,32 @@ export default function Dashboard() {
           <DefaultButton onClick={() => setModalProduct(true)}>+</DefaultButton>
         </Tooltip>
       </Box>
-      <Box className="flex-1 w-full flex flex-wrap gap-6 overflow-auto max-h-[calc(100vh-190px)] pr-3">
-        {products?.map((product: ProductProps) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            setSelectedProduct={setSelectedProducts}
-            setModalProduct={setModalProduct}
-          />
-        ))}
-        {hasNextPage && (
-          <div
-            ref={loadMoreRef}
-            className="h-10 flex justify-center items-center"
-          >
-            asdas
-          </div>
-        )}
-      </Box>
+      {isLoading && productFilters.page === 1 ? (
+        <Box className="flex-1 w-full flex flex-wrap gap-6 overflow-auto max-h-[calc(100vh-190px)] pr-3 content-start">
+          {[...Array(20)].map((_, index) => (
+            <Skeleton height={150} width={300} key={index} />
+          ))}
+        </Box>
+      ) : (
+        <Box className="flex-1 w-full flex flex-wrap gap-6 overflow-auto max-h-[calc(100vh-190px)] pr-3 content-start">
+          {products?.map((product: ProductProps) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              setSelectedProduct={setSelectedProducts}
+              setModalProduct={setModalProduct}
+            />
+          ))}
+          {hasNextPage && (
+            <div
+              ref={loadMoreRef}
+              className="h-10 flex justify-center items-center"
+            >
+              asdas
+            </div>
+          )}
+        </Box>
+      )}
       <ModalProduct
         product={selectedProducts}
         setSelectedProduct={setSelectedProducts}

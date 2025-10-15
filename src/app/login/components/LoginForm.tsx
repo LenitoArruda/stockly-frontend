@@ -1,6 +1,6 @@
 'use client';
 
-import { login } from './actions';
+import { login } from '../actions';
 import { useActionState, useEffect } from 'react';
 import { Box } from '@radix-ui/themes';
 import { redirect } from 'next/navigation';
@@ -14,9 +14,12 @@ export function LoginForm() {
 
   useEffect(() => {
     if (state?.user) {
-      console.log(state.user);
-      dispatch(setUser(state.user));
-      redirect('/dashboard');
+      const login = async () => {
+        dispatch(setUser(state.user));
+        localStorage.setItem('user', JSON.stringify(state.user));
+        redirect('/products');
+      };
+      login();
     }
   }, [dispatch, state]);
 
