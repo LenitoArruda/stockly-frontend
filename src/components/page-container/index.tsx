@@ -18,17 +18,21 @@ export function PageContainer(props: PageContainerProps) {
 
   const user = useSelector((state: RootState) => state.userReducer.user);
 
-  const { data: dataAuthUser } = useAuthUser();
+  const { data: dataAuthUser, isError } = useAuthUser();
 
   const userLocalStorage: User = JSON.parse(
-    localStorage.getItem('user') || '{}',
+    localStorage?.getItem('user') || '{}',
   );
 
   useEffect(() => {
     if (dataAuthUser) {
       dispatch(setUser(dataAuthUser as unknown as User));
     }
-  }, [dataAuthUser, dispatch]);
+    if (isError) {
+      localStorage?.removeItem('user');
+      dispatch(setUser({} as User));
+    }
+  }, [dataAuthUser, dispatch, isError]);
 
   const classNameMain =
     userLocalStorage.id || user?.id

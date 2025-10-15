@@ -10,7 +10,7 @@ export function ModalDefault(props: ModalDefaultProps) {
   const { open, title, onClose, children, className } = props;
 
   const classNameParent = open
-    ? 'fixed inset-0 flex items-center justify-center bg-black/60  z-50'
+    ? 'fixed inset-0 flex items-center justify-center bg-black/60  z-50 absolute'
     : 'hidden';
 
   return (

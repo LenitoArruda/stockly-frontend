@@ -1,9 +1,9 @@
 'use client';
 
 import { PageTitle } from '@/components/page-title';
-import { useProducts } from '@/hooks/useProducts';
+import { useDeleteProduct, useProducts } from '@/hooks/useProducts';
 import { ProductProps, ProductsFilterProps } from '@/types/product.types';
-import { Box, Tooltip } from '@radix-ui/themes';
+import { Box, Spinner, Tooltip } from '@radix-ui/themes';
 import { useEffect, useRef, useState } from 'react';
 import { ProductCard } from './components/ProductCard';
 import { ModalProduct } from './components/ModalProduct';
@@ -11,6 +11,7 @@ import { DefaultButton } from '@/components/default-button';
 import { Filters } from './components/Filters';
 import 'react-loading-skeleton/dist/skeleton.css';
 import Skeleton from 'react-loading-skeleton';
+import { ModalConfirmation } from '@/components/modal-confirmation';
 
 export const defaultFilter: ProductsFilterProps = {
   page: 1,
@@ -35,8 +36,19 @@ export default function Products() {
     null,
   );
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [modalConfirmationOpen, setModalConfirmationOpen] = useState(false);
 
   const { data: dataProducts, isLoading } = useProducts(productFilters);
+  const { mutate: deleteProduct, isPending } = useDeleteProduct();
+
+  const handleDeleteProduct = async () => {
+    deleteProduct(Number(selectedProducts?.id));
+    handleCloseModalConfirmation();
+  };
+
+  const handleCloseModalConfirmation = () => {
+    setModalConfirmationOpen(false);
+  };
 
   useEffect(() => {
     if (dataProducts) {
@@ -101,6 +113,7 @@ export default function Products() {
               product={product}
               setSelectedProduct={setSelectedProducts}
               setModalProduct={setModalProduct}
+              setModalConfirmationOpen={setModalConfirmationOpen}
             />
           ))}
           {hasNextPage && (
@@ -108,16 +121,26 @@ export default function Products() {
               ref={loadMoreRef}
               className="h-10 flex justify-center items-center"
             >
-              asdas
+              <Spinner />
             </div>
           )}
         </Box>
       )}
+
       <ModalProduct
         product={selectedProducts}
         setSelectedProduct={setSelectedProducts}
         modalProduct={modalProduct}
         setModalProduct={setModalProduct}
+      />
+
+      <ModalConfirmation
+        open={modalConfirmationOpen}
+        handleCancel={handleCloseModalConfirmation}
+        handleConfirm={handleDeleteProduct}
+        title={`Delete ${selectedProducts?.sku}`}
+        message="Are you sure you want to delete this product? All variants will also be deleted."
+        isLoading={isPending}
       />
     </Box>
   );

@@ -2,7 +2,7 @@
 
 import { DefaultButton } from '@/components/default-button';
 import { PageTitle } from '@/components/page-title';
-import { useProductById } from '@/hooks/useProducts';
+import { useDeleteProduct, useProductById } from '@/hooks/useProducts';
 import { ProductProps, ProductVariantProps } from '@/types/product.types';
 import { Box, IconButton, Tooltip } from '@radix-ui/themes';
 import { Field } from '../components/Field';
@@ -11,13 +11,14 @@ import Skeleton from 'react-loading-skeleton';
 import { redirect } from 'next/navigation';
 import { ProductCard } from '@/app/products/components/ProductCard';
 import { useState } from 'react';
-import { PencilIcon } from '@phosphor-icons/react';
+import { PencilIcon, TrashIcon } from '@phosphor-icons/react';
 import { ModalProduct } from '@/app/products/components/ModalProduct';
+import { ModalConfirmation } from '@/components/modal-confirmation';
 
 export default function Product({ params }: { params: { id: string } }) {
   const { id } = params;
 
-  const { data: dataProduct, isLoading } = useProductById(id);
+  const { data: dataProduct, isLoading, refetch } = useProductById(id);
   const product: ProductProps = dataProduct || {};
   const convertToProduct = (data: ProductVariantProps): ProductProps => {
     return {
@@ -31,7 +32,10 @@ export default function Product({ params }: { params: { id: string } }) {
     };
   };
 
+  const { mutate: deleteProduct, isPending } = useDeleteProduct();
+
   const [modalProduct, setModalProduct] = useState(false);
+  const [modalConfirmationOpen, setModalConfirmationOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductProps | null>(
     null,
   );
@@ -45,7 +49,27 @@ export default function Product({ params }: { params: { id: string } }) {
   const handleBackButton = () => {
     redirect('/products');
   };
-  console.log(product);
+
+  const handleDeleteProduct = async () => {
+    deleteProduct(Number(product.id));
+    handleBackButton();
+  };
+
+  const handleDeleteVariant = async () => {
+    deleteProduct(Number(selectedProduct?.id));
+    refetch();
+    handleCloseModalConfirmation();
+  };
+
+  const handleCloseModalConfirmation = () => {
+    setModalConfirmationOpen(false);
+  };
+
+  const handleOpenModalConfirmation = () => {
+    setSelectedProduct(null);
+    setModalConfirmationOpen(true);
+  };
+
   return (
     <Box className="flex w-full flex-1 flex-col gap-6 max-h-[calc(100vh-150px)] overflow-auto">
       <Box className="flex items-center justify-between mr-3">
@@ -57,6 +81,18 @@ export default function Product({ params }: { params: { id: string } }) {
           >
             <IconButton className="cursor-pointer" onClick={handleEditProduct}>
               <PencilIcon size={17} />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip
+            content={'Delete product'}
+            className="bg-black/50 p-1 rounded text-white text-xs"
+          >
+            <IconButton
+              className="cursor-pointer"
+              onClick={handleOpenModalConfirmation}
+            >
+              <TrashIcon color="#dd6363" size={17} />
             </IconButton>
           </Tooltip>
         </Box>
@@ -96,20 +132,36 @@ export default function Product({ params }: { params: { id: string } }) {
             product?.variants.length > 0 &&
             product.variants.map((variant) => (
               <ProductCard
-                showEditButton
+                isVariant
                 key={variant.id}
                 product={convertToProduct(variant)}
                 setSelectedProduct={setSelectedProduct}
                 setModalProduct={setModalProduct}
+                setModalConfirmationOpen={setModalConfirmationOpen}
               />
             ))}
+          {product?.variants?.length === 0 && <Box>No variants found.</Box>}
         </Box>
       )}
+
       <ModalProduct
         product={selectedProduct}
         setSelectedProduct={setSelectedProduct}
         modalProduct={modalProduct}
         setModalProduct={setModalProduct}
+      />
+
+      <ModalConfirmation
+        open={modalConfirmationOpen}
+        handleCancel={handleCloseModalConfirmation}
+        handleConfirm={
+          selectedProduct ? handleDeleteVariant : handleDeleteProduct
+        }
+        title={`Delete ${
+          selectedProduct ? selectedProduct?.sku : product?.sku
+        }`}
+        message="Are you sure you want to delete this product? All variants will also be deleted."
+        isLoading={isPending}
       />
     </Box>
   );
