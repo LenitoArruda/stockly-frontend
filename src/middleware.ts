@@ -32,6 +32,10 @@ export default async function middleware(req: NextRequest) {
     if (isProtected && !payload?.sub) {
       return NextResponse.redirect(new URL('/login', req.url));
     }
+
+    if (path.startsWith('/users') && payload?.role === 'manager') {
+      return NextResponse.redirect(new URL('/products', req.url));
+    }
   }
 
   if (isProtected && !token) {
