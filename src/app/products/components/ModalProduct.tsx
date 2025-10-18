@@ -92,6 +92,7 @@ export function ModalProduct(props: ModalProductProps) {
     isPending: isPendingVariant,
     isSuccess: isSuccessVariant,
   } = useCreateVariant();
+
   const {
     mutate: mutateUpdate,
     isPending: isPendingUpdate,
@@ -104,6 +105,7 @@ export function ModalProduct(props: ModalProductProps) {
         setErrorAttributes(true);
         return;
       }
+
       const bodyUpdateRequest: CreateVariantProps = {
         parentId: Number(product?.id),
         name: data.name,
@@ -112,9 +114,12 @@ export function ModalProduct(props: ModalProductProps) {
         sku: createSku(data.name),
         attributes,
       };
+
       mutateVariant(bodyUpdateRequest);
+
       return;
     }
+
     if (product) {
       const bodyUpdateRequest: UpdateProductProps = {
         id: Number(product?.id),
@@ -124,7 +129,9 @@ export function ModalProduct(props: ModalProductProps) {
         categoryId: Number(data.categoryId),
         attributes,
       };
+
       if (setProductFilters) setProductFilters(defaultFilter);
+
       mutateUpdate(bodyUpdateRequest);
     } else {
       const bodyRequest: CreateProductProps = {
@@ -134,9 +141,12 @@ export function ModalProduct(props: ModalProductProps) {
         sku: createSku(data.name),
         categoryId: Number(data.categoryId),
       };
+
       if (setProductFilters) setProductFilters(defaultFilter);
+
       mutate(bodyRequest);
     }
+    onClose();
   };
 
   const removeAttribute = (id: number) => {
@@ -175,11 +185,8 @@ export function ModalProduct(props: ModalProductProps) {
       });
       setAttributes(product.attributes || {});
     }
-    if (!modalProduct) {
-      onClose();
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [modalProduct, product, productVariant, reset]);
+  }, [modalProduct, product, productVariant]);
 
   return (
     <ModalDefault

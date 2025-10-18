@@ -57,23 +57,22 @@ export default function Products() {
       setHasNextPage(page < dataProducts.totalPages);
 
       if (page === 1) {
-        setProducts(dataProducts?.data || []);
+        setProducts(dataProducts.data || []);
       } else {
-        setProducts((prevProducts) => [
-          ...prevProducts,
-          ...(dataProducts?.data || []),
-        ]);
+        setProducts((prev) => [...prev, ...(dataProducts.data || [])]);
       }
     }
   }, [dataProducts]);
 
   useEffect(() => {
-    if (!loadMoreRef.current || !dataProducts) return;
+    if (!loadMoreRef.current) return;
+    if (isLoading) return;
+    if (!hasNextPage) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNextPage) {
-          setProductFilters((prev: ProductsFilterProps) => ({
+        if (entries[0].isIntersecting) {
+          setProductFilters((prev) => ({
             ...prev,
             page: prev.page + 1,
           }));
@@ -84,8 +83,7 @@ export default function Products() {
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataProducts]);
+  }, [hasNextPage, isLoading]);
 
   return (
     <Box className="flex w-full flex-1 flex-col gap-2">
@@ -118,10 +116,10 @@ export default function Products() {
               setModalConfirmationOpen={setModalConfirmationOpen}
             />
           ))}
-          {hasNextPage && (
+          {hasNextPage && !isLoading && products.length >= 20 && (
             <div
               ref={loadMoreRef}
-              className="h-10 flex justify-center items-center bg-red-200"
+              className="h-10 flex justify-center items-center"
             >
               <Spinner />
             </div>

@@ -69,7 +69,6 @@ export default function Product({ params }: { params: { id: string } }) {
   };
 
   const handleOpenModalConfirmation = () => {
-    setSelectedProduct(null);
     setModalConfirmationOpen(true);
   };
 
