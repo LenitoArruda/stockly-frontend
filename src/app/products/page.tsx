@@ -112,6 +112,7 @@ export default function Products() {
         <Box className="flex-1 w-full flex flex-wrap gap-6 overflow-auto max-h-[calc(100vh-190px)] pr-3 content-start">
           {
             dataProducts?.pages?.map((page) => {
+              console.log
               return (
                 <Box key={page.currentPage} className='flex flex-wrap gap-6'>
                   {page?.data?.map((product: ProductProps) => (

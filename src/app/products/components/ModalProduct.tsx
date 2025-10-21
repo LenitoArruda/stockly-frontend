@@ -31,7 +31,7 @@ interface ModalProductProps {
   modalProduct: boolean;
   setModalProduct: (modalProduct: boolean) => void;
   setSelectedProduct: (selectedProduct: ProductProps | null) => void;
-  setProductFilters: (filters: ProductsFilterProps) => void;
+  setProductFilters?: (filters: ProductsFilterProps) => void;
   createVariant?: boolean;
 }
 
@@ -167,11 +167,10 @@ export function ModalProduct(props: ModalProductProps) {
 
   useEffect(() => {
     if (isSuccess || isSuccessUpdate || isSuccessVariant) {
-      setProductFilters(defaultFilter);
+      if (setProductFilters) setProductFilters(defaultFilter);
       queryClient.invalidateQueries({ queryKey: ['products'] });
       onClose();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, isSuccessUpdate, isSuccessVariant]);
 
   useEffect(() => {
@@ -195,8 +194,8 @@ export function ModalProduct(props: ModalProductProps) {
         createVariant
           ? `Create Variant | ${product?.sku}`
           : product
-          ? `Edit Product | ${product.sku}`
-          : 'New Product'
+            ? `Edit Product | ${product.sku}`
+            : 'New Product'
       }
       className="w-[90vw] lg:w-[70vw]  xl:w-[50vw]"
     >
