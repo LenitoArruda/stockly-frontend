@@ -12,11 +12,11 @@ type PageContainerProps = {
 export function PageContainer(props: PageContainerProps) {
   const { children } = props;
 
-  const ls = safeLocalStorage();
-
   const router = useRouter();
 
   const { data, isPending } = useAuthUser();
+
+  const userData = data || undefined
 
   const [token, setToken] = useState<string | null>(null);
 
@@ -28,7 +28,7 @@ export function PageContainer(props: PageContainerProps) {
       return;
     }
     setToken(tokenLocalStorage);
-  }, [ls, router]);
+  }, [router]);
 
   useEffect(() => {
     if (!data && token && !isPending) {
@@ -36,7 +36,7 @@ export function PageContainer(props: PageContainerProps) {
       localStorage?.clear();
       router.push('/login');
     }
-  }, [token, isPending]);
+  }, [token, isPending, userData, router]);
 
   const classNameMain = token
     ? 'bg-gray-100 m-6 p-5 pr-2 flex-1 flex overflow-auto bg-white rounded-xl mt-[80px]'
