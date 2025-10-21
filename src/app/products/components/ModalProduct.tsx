@@ -31,7 +31,7 @@ interface ModalProductProps {
   modalProduct: boolean;
   setModalProduct: (modalProduct: boolean) => void;
   setSelectedProduct: (selectedProduct: ProductProps | null) => void;
-  setProductFilters?: (filters: ProductsFilterProps) => void;
+  setProductFilters: (filters: ProductsFilterProps) => void;
   createVariant?: boolean;
 }
 
@@ -47,11 +47,12 @@ export function ModalProduct(props: ModalProductProps) {
 
   const { data: dataCategories } = useCategories();
 
+  const queryClient = useQueryClient();
+
   const onClose = () => {
     setSelectedProduct(null);
     setModalProduct(false);
     setErrorAttributes(false);
-    queryClient.invalidateQueries({ queryKey: ['products'] });
     setAttributes({});
     reset();
   };
@@ -85,7 +86,6 @@ export function ModalProduct(props: ModalProductProps) {
     value: string;
   }>({ title: '', value: '' });
 
-  const queryClient = useQueryClient();
   const { mutate, isPending, isSuccess } = useCreateProduct();
   const {
     mutate: mutateVariant,
@@ -130,8 +130,6 @@ export function ModalProduct(props: ModalProductProps) {
         attributes,
       };
 
-      if (setProductFilters) setProductFilters(defaultFilter);
-
       mutateUpdate(bodyUpdateRequest);
     } else {
       const bodyRequest: CreateProductProps = {
@@ -142,11 +140,8 @@ export function ModalProduct(props: ModalProductProps) {
         categoryId: Number(data.categoryId),
       };
 
-      if (setProductFilters) setProductFilters(defaultFilter);
-
       mutate(bodyRequest);
     }
-    onClose();
   };
 
   const removeAttribute = (id: number) => {
@@ -171,7 +166,11 @@ export function ModalProduct(props: ModalProductProps) {
     product?.parentId || createVariant || Object.keys(attributes).length > 0;
 
   useEffect(() => {
-    if (isSuccess || isSuccessUpdate || isSuccessVariant) onClose();
+    if (isSuccess || isSuccessUpdate || isSuccessVariant) {
+      setProductFilters(defaultFilter);
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      onClose();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, isSuccessUpdate, isSuccessVariant]);
 

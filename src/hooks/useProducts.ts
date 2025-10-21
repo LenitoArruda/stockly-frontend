@@ -5,14 +5,21 @@ import {
   ProductsFilterProps,
   UpdateProductProps,
 } from '@/types/product.types';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useInfiniteQuery } from '@tanstack/react-query';
 
 export function useProducts(params: ProductsFilterProps) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['products', params],
-    queryFn: async () => {
-      const { data } = await api.get('/products/paginated', { params });
+    queryFn: async ({ pageParam = 1 }) => {
+      const { data } = await api.get('/products/paginated', { params: { ...params, page: pageParam } });
       return data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.totalPages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
     },
   });
 }
@@ -28,56 +35,36 @@ export function useProductById(id: number | string) {
 }
 
 export function useCreateProduct() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (newProduct: CreateProductProps) => {
       const { data } = await api.post('/products', newProduct);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-    },
   });
 }
 
 export function useCreateVariant() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (newProduct: CreateVariantProps) => {
       const { data } = await api.post('/products/variant', newProduct);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-    },
   });
 }
 
 export function useUpdateProduct() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async ({ id, ...rest }: UpdateProductProps) => {
       const { data } = await api.patch(`/products/${id}`, rest);
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-    },
   });
 }
 
 export function useDeleteProduct() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (id: number) => {
       await api.delete(`/products/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 }
