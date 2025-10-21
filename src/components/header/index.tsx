@@ -98,20 +98,20 @@ export function Header() {
               <Avatar
                 size="2"
                 src="/default-avatar.png"
-                fallback="U"
+                fallback={user?.name.charAt(0).toUpperCase() || 'U'}
                 radius="full"
               />
               <span className="hidden sm:inline font-medium text-sm">
-                Usuário
+                {user?.name}
               </span>
             </button>
           </DropdownMenu.Trigger>
 
-          <DropdownMenu.Content className="min-w-[200px] bg-white p-2 rounded shadow">
+          <DropdownMenu.Content className="min-w-[200px] bg-white p-2 rounded shadow p-4 ">
             <DropdownMenu.Label className="font-medium">
               User Info
             </DropdownMenu.Label>
-            <DropdownMenu.Item>Email: user@email.com</DropdownMenu.Item>
+            <DropdownMenu.Item>Email: {user?.email}</DropdownMenu.Item>
             <DropdownMenu.Item>Role: {user?.role}</DropdownMenu.Item>
             <DropdownMenu.Item>
               <LogoutButton />
