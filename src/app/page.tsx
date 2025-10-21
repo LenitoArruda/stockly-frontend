@@ -1,3 +1,3 @@
 export default function Home() {
-  return <div>Welcome to Stockly!</div>;
+  return <div></div>;
 }

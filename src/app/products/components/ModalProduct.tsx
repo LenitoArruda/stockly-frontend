@@ -31,7 +31,6 @@ interface ModalProductProps {
   modalProduct: boolean;
   setModalProduct: (modalProduct: boolean) => void;
   setSelectedProduct: (selectedProduct: ProductProps | null) => void;
-  setProductFilters?: (filters: ProductsFilterProps) => void;
   createVariant?: boolean;
 }
 
@@ -41,7 +40,6 @@ export function ModalProduct(props: ModalProductProps) {
     setSelectedProduct,
     setModalProduct,
     modalProduct,
-    setProductFilters,
     createVariant,
   } = props;
 
@@ -167,7 +165,6 @@ export function ModalProduct(props: ModalProductProps) {
 
   useEffect(() => {
     if (isSuccess || isSuccessUpdate || isSuccessVariant) {
-      if (setProductFilters) setProductFilters(defaultFilter);
       queryClient.invalidateQueries({ queryKey: ['products'] });
       onClose();
     }

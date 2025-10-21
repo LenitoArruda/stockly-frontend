@@ -55,7 +55,6 @@ export default function Products() {
 
   useEffect(() => {
     if (isSuccess) {
-      setProductFilters(defaultFilter);
       queryClient.invalidateQueries({ queryKey: ['products'] });
       handleCloseModalConfirmation();
     }
@@ -63,30 +62,9 @@ export default function Products() {
 
   useEffect(() => {
     if (inView) {
-      setProductFilters(defaultFilter);
       fetchNextPage();
     }
   }, [inView, fetchNextPage]);
-
-  useEffect(() => {
-    if (!loadMoreRef.current) return;
-    if (isLoadingMore) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setProductFilters((prev) => ({
-            ...prev,
-            page: prev.page + 1,
-          }));
-        }
-      },
-      { threshold: 1 },
-    );
-
-    observer.observe(loadMoreRef.current);
-    return () => observer.disconnect();
-  }, [isLoadingMore]);
 
   return (
     <Box className="flex w-full flex-1 flex-col gap-2">
@@ -128,23 +106,17 @@ export default function Products() {
               )
             })
           }
-          {/* {products?.map((product: ProductProps) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              setSelectedProduct={setSelectedProducts}
-              setModalProduct={setModalProduct}
-              setModalConfirmationOpen={setModalConfirmationOpen}
-            />
-          ))} */}
-          {!isLoadingMore && (
-            <div
-              ref={ref}
-              className="h-10 flex justify-center items-center"
-            >
-              <Spinner />
-            </div>
-          )}
+
+          {
+            !isLoadingMore && (
+              <div
+                ref={ref}
+                className="h-10 flex justify-center items-center"
+              >
+                <Spinner />
+              </div>
+            )
+          }
         </Box>
       )}
 
@@ -153,7 +125,6 @@ export default function Products() {
         setSelectedProduct={setSelectedProducts}
         modalProduct={modalProduct}
         setModalProduct={setModalProduct}
-        setProductFilters={setProductFilters}
       />
 
       <ModalConfirmation

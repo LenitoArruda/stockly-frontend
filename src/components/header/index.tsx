@@ -21,7 +21,7 @@ export function Header() {
   const user: User = userLocalStorage;
 
   return (
-    <header className="h-[60px] bg-white flex items-center px-6 shadow-md justify-between">
+    <div className="h-full bg-white flex items-center px-6 shadow-md justify-between">
       <div className="md:hidden">
         <button
           onClick={() => setOpenMenu(!openMenu)}
@@ -128,6 +128,6 @@ export function Header() {
           />
         </Box>
       </div>
-    </header>
+    </div>
   );
 }

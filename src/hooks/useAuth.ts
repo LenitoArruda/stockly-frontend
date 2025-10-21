@@ -12,7 +12,7 @@ export function useAuthUser() {
   return useQuery({
     queryKey: ['authUser'],
     queryFn: fetchMe,
-    retry: false,
+    retry: false
   });
 }
 
